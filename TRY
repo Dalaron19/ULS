@@ -1,0 +1,191 @@
+// Selecting data from a Table
+// Obteniendo datos de una Tabla
+var globalTunnel = require('global-tunnel');
+
+process.env.http_proxy = 'http://PITC-Zscaler-EMEA-London3PR.proxy.corporate.ge.com:80';
+globalTunnel.initialize();
+
+var mysql = require('mysql');
+
+var con = mysql.createConnection({
+  host: "10.138.26.222",
+  user: "root",
+  password: "3N*KsS#1",
+  database: "conectividad"
+});
+var SmartSheet_id_main = "8727286590531460";
+
+function freeze(time) {
+  const stop = new Date().getTime() + time;
+  while(new Date().getTime() < stop);       
+}
+
+function main(sheetInfo) {
+  
+  con.connect(function(err) {
+    if (err) throw err;
+    console.log("Connected!");
+    con.query("SELECT conectividad.iberia_bbt_view.LCT AS lct,conectividad.iberia_bbt_view.AREA AS area,IF(conectividad.eom_us_orders2.gon <> "", conectividad.eom_us_orders2.gon, conectividad.iberia_bbt_view.gon) AS gon,conectividad.systems_serial_view.serial_no,conectividad.iberia_bbt_view.`System ID` AS system_id,conectividad.iberia_bbt_view.`System Name` AS system_name,conectividad.iberia_bbt_view.`Site Name` AS site_name,conectividad.iberia_bbt_view.CR_RRR AS cr_rrr,conectividad.iberia_bbt_view.Site_Status AS site_status,conectividad.iberia_bbt_view.`Warranty and/or Contract` AS w_c,conectividad.eom_us_orders2.install_sche_date AS edd_date,conectividad.eom_us_orders2.eom_accept_date AS app_date,conectividad.iberia_systems_detalles.IP AS IP,conectividad.iberia_bbt_view.System_ck_status AS system_status,(SELECT `conectividad`.`iberia_systems_comments`.`Comment` AS `COMMENT` FROM `conectividad`.`iberia_systems_comments` WHERE `iberia_bbt_view`.`System ID` = `conectividad`.`iberia_systems_comments`.`System_ID` ORDER BY `conectividad`.`iberia_systems_comments`.`ID_Comment` DESC LIMIT 1) AS `COMMENT`, conectividad.eom_us_orders2.pjm, conectividad.eom_us_orders2.sales_owner, conectividad.iberia_bbt_view.`Broadband @ Checkout Mode` AS ck_mode, conectividad.iberia_bbt_view.BB_Mode AS BB_Mode, conectividad.iberia_bbt_view.`System Checkout Date` AS ck_date, conectividad.iberia_bbt_view.`End of Install Date` AS end_install_date, YEAR(conectividad.iberia_bbt_view.`End of Install Date`) AS year_install FROM conectividad.iberia_bbt_view LEFT JOIN conectividad.iberia_systems_detalles ON iberia_bbt_view.`System ID` = conectividad.iberia_systems_detalles.`ID system` LEFT JOIN conectividad.psm_modalidad ON conectividad.iberia_systems_detalles.ID_Area = conectividad.psm_modalidad.ID_Area AND conectividad.iberia_systems_detalles.`Sub Modality` = conectividad.psm_modalidad.Modalidad AND conectividad.iberia_systems_detalles.AwModality = conectividad.psm_modalidad.ID_Submodalidad LEFT JOIN conectividad.iberia_systems_comments ON conectividad.iberia_systems_comments.System_ID = iberia_bbt_view.`System ID` LEFT JOIN iscorecard.sites_group ON iberia_bbt_view.`Site ID` = iscorecard.sites_group.site_id LEFT JOIN conectividad.next_pm_view ON iberia_bbt_view.`System ID` = next_pm_view.system_id LEFT JOIN conectividad.eom_us_orders2 ON conectividad.iberia_bbt_view.gon = conectividad.eom_us_orders2.gon LEFT JOIN conectividad.systems_serial_view ON conectividad.iberia_bbt_view.`System ID` = conectividad.systems_serial_view.system_id WHERE conectividad.iberia)", function (err, rows_db) {
+      if (err) throw err;
+      con.end();
+      var counter = 1;
+      row_feeded = [];
+      var api = '32w89yuhWHsnqDiU8d6vwTYPaPMK2EvkZqWhf'
+      
+      rows_db.forEach(function(row_db) {
+        //console.log(counter);
+        if (counter === 1) {api = '32w89yuhWHsnqDiU8d6vwTYPaPMK2EvkZqWhf';} 
+        if (counter === 2) {api = 'qj5JMAJnQU3Phcq57hXfeJWCkOUD003lUh6mr';}
+        if (counter === 3) {api = '4GQGRQJpJC56u2O64piqWjO4ZA7ntJsT0em9X';}
+        if (counter === 4) {api = '522PMVKWcsF2Jo2djPT5A6UODOOaX6FZu2asv';}
+        if (counter === 5) {api = 'fXjxWGeQ5N1tHeGG0gJAvMOsBHyNTc97rEtzX';}
+        if (counter === 6) {api = 'R8gWYsZkyKPmGNlB5bm7icUuZKzi4hPKMZBu0';
+          counter = 0;
+        }
+        counter++;
+
+        // establecemos las variables
+        let LCT = row_db.LCT;
+        let AREA = row_db.AREA;
+        let GON = row.db.GON;
+        //let serial_no = row.db.serial_no
+        var System_ID = row_db.System_ID;
+        var System_Name = row_db.System_Name;
+        let Site_Name = row_db.Site_Name;
+        let Site_Status = row_db.Site_Status;
+        let group_name = row_db.group_name;
+        let CR_RRR = row_db.CR_RRR;
+        let System_Checkout_Date_db = row_db.System_Checkout_Date;
+        let System_Checkout_Date = "";
+        if (System_Checkout_Date_db !== '' && System_Checkout_Date_db !== null && System_Checkout_Date_db !== undefined) {System_Checkout_Date = System_Checkout_Date_db.toISOString().slice(0,10);}
+        let BB_Mode = row_db.BB_Mode;
+        let Modality = row_db.Modality;
+        let COMMENT = row_db.COMMENT;
+        let IP = row_db.IP;
+        let Mask = row_db.Mask;
+        let Gateway = row_db.Gateway;
+        var SystemID_columnID = "1808138981664644";
+
+        freeze(5);
+        const obj = sheetInfo;
+        var existe = "false";
+        for(row of obj.rows) {
+          for(cell of row.cells) {
+              if ((cell.columnId == SystemID_columnID) && (cell.value == System_ID))  {
+                existe = "true";
+              } 
+          }
+        }
+        if (existe == "false") {
+          console.log(System_ID);
+          freeze(50);
+          var System_ID = System_ID;
+          var System_Name = System_Name;
+          var feed_row = 
+          {
+            "toTop": true,
+            "cells": [
+              {
+                "columnId": 2934038888507268,
+                "value": lct,
+                "strict": false
+              },
+              {
+                "columnId": 7437638515877764,
+                "value": AREA,
+                "strict": false
+              },
+              {
+                "columnId": 1808138981664644,
+                "value": System_ID,
+                "strict": false
+              },
+              {
+                "columnId": 6311738609035140,
+                "value": System_Name,
+                "strict": false
+              },
+              {
+                "columnId": 4059938795349892,
+                "value": Site_Name,
+                "strict": false
+              },
+              {
+                "columnId": 8206497791403908,
+                "value": Modality,
+                "strict": false
+              },
+              {
+                "columnId": 2652563911796612,
+                "value": System_Checkout_Date,
+                "strict": false
+              },
+              {
+                "columnId": 3778463818639236,
+                "value": IP,
+                "strict": false
+              },
+              {
+                "columnId": 7719113492588420,
+                "value": COMMENT,
+                "strict": false
+              }
+            ]
+          }
+          row_feeded.push(feed_row);
+        }
+        //freeze(10000);
+      });
+        var client = require('smartsheet');
+        var smartsheet = client.createClient({
+          accessToken: api,
+          logLevel: 'info'
+        });
+        // Set options
+        var options = {
+          sheetId: SmartSheet_id_main,
+          body: row_feeded
+          };
+        // Add rows to sheet
+        smartsheet.sheets.addRows(options)
+          .then(function(newRows) {
+            freeze(5);
+            console.log(newRows);
+            process.exit(0);
+          })
+          .catch(function(error) {
+            freeze(50);
+            console.log(error);
+          });
+      freeze(105);
+      console.log("Finished!");
+      //process.exit(0);
+    });
+  });
+}
+
+var client = require('smartsheet');
+var smartsheet = client.createClient({
+  accessToken: '32w89yuhWHsnqDiU8d6vwTYPaPMK2EvkZqWhf',
+  logLevel: 'info'
+});
+// Get sheet
+// Obtener la hoja
+var options = {
+  id: SmartSheet_id_main 
+};
+smartsheet.sheets.getSheet(options)
+  .then(function(sheetInfo) {
+    main(sheetInfo);
+    freeze(50);
+  })
+  .catch(function(error) {
+    freeze(50);
+      console.log(error);
+  });
+
+
+
+
+
+  
